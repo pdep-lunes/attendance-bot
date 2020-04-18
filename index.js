@@ -1,5 +1,6 @@
 require('dotenv').config();
 const Discord = require('discord.js');
+const commands = require('./commands/index')
 const bot = new Discord.Client();
 const TOKEN = process.env.TOKEN;
 
@@ -10,17 +11,9 @@ bot.on('ready', () => {
 });
 
 bot.on('message', msg => {
-  let channel = msg.channel;
-  let member = msg.member;
-  let allowedRoles = ["docente"];
-
-  if(msg.content == '!delete') {
-    if(member.roles.some(role => allowedRoles.some(allowedRole => allowedRole == role.name))) {
-      channel.fetchMessages().then(messages => channel.bulkDelete(messages.size));
+  commands.forEach(command => {
+    if(command.name == msg.content) {
+      command.execute(msg, command.allowedRoles);
     }
-    else {
-      msg.reply(", Ojito eh, no tenes permisos para eliminar estos mensajes!")
-    }
-  }
-  
+  });
 });
