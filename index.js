@@ -10,10 +10,7 @@ bot.on('ready', () => {
   console.info(`Logged in as ${bot.user.tag}!`);
 });
 
-bot.on('message', msg => {
-  commands.forEach(command => {
-    if(command.name == msg.content) {
-      command.execute(msg, command.allowedRoles);
-    }
-  });
+bot.on('message', async msg => {
+  const commandToExec = commands.find(command => command.name == msg.content)
+  if(commandToExec) await commandToExec.execute(msg, commandToExec.allowedRoles)
 });
