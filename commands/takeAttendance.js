@@ -1,18 +1,25 @@
 const executeCheckingRoles = require('../utils/executeCheckingRoles')
 const { GoogleSpreadsheet } = require('google-spreadsheet')
+const creds = require('../cafe-server-1546112135269-ecca3ef2e946.json')
+const getPresentsFrom = require('../utils/getPresentsFrom')
 
 const takeAttendance = async (msg, allowedRoles) => {
     try {
-        
-        const doc = new GoogleSpreadsheet('12LnVK3x71EpABUFuH8pSd0SLJO2OdBWmBaIU98rbyg8');
-        console.log(process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL)
-        await doc.useServiceAccountAuth({
-            client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-            private_key: process.env.GOOGLE_PRIVATE_KEY
-          });
-        console.log("hehe")
+        const presentPeople = await getPresentsFrom(msg.channel)
+
+        const doc = new GoogleSpreadsheet('1rtHUbEfEs6np-57ONBQ7gdsjjR3HoGCjYJgOrezUsK4');
+        await doc.useServiceAccountAuth(creds);
         await doc.loadInfo();
-        console.log(doc.title);
+        const sheet = doc.sheetsByIndex[0];
+        await sheet.loadHeaderRow()
+        console.log(sheet.headerValues)
+        sheet.setHeaderRow([...sheet.headerValues, "hahaA"])
+        const dataOnSheet = await sheet.getRows();
+        dataOnSheet.forEach(async row => {
+            row.test = "haha this works"
+            await row.save()
+        })
+        console.log(dataOnSheet.map(row => row.username));
     } catch (error) {
         console.log(error)
     }
