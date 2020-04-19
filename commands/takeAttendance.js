@@ -26,7 +26,7 @@ const getAttendanceSheetWithNewHeaderDate = async (document, dateHeader) => {
 }
 
 const takeAttendance = async (msg, allowedRoles) => {
-    executeCheckingRoles(msg, allowedRoles, async () => {
+    await executeCheckingRoles(msg, allowedRoles, async () => {
         try {
             const presentPeople = await getAttendanceFrom(msg.channel);
             const doc = await getSpreadSheet();
@@ -36,8 +36,6 @@ const takeAttendance = async (msg, allowedRoles) => {
             const sheet = await getAttendanceSheetWithNewHeaderDate(doc, dateHeader);
     
             const dataOnSheet = await sheet.getRows();
-            
-            const usersOnSheet = dataOnSheet.map(row => row.username);
     
             presentPeople.forEach(async presentPerson => {
                 const rowToUpdate = dataOnSheet.find(row => row.username == presentPerson);
