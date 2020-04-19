@@ -1,11 +1,13 @@
 const executeCheckingRoles = require('../utils/executeCheckingRoles')
 const { GoogleSpreadsheet } = require('google-spreadsheet')
-const creds = require('../cafe-server-1546112135269-ecca3ef2e946.json')
 const getPresentsFrom = require('../utils/getPresentsFrom')
 
 const getSpreadSheet = async () => {
-    const doc = new GoogleSpreadsheet('1rtHUbEfEs6np-57ONBQ7gdsjjR3HoGCjYJgOrezUsK4');
-    await doc.useServiceAccountAuth(creds);
+    const doc = new GoogleSpreadsheet('1rtHUbEfEs6np-57ONBQ7gdsjjR3HoGCjYJgOrezUsK4'); // Spreadsheet link ID
+    await doc.useServiceAccountAuth({
+        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n')
+    });
     await doc.loadInfo();
     return doc;
 }
