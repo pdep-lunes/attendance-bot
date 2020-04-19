@@ -1,6 +1,6 @@
 const executeCheckingRoles = require('../utils/executeCheckingRoles')
 const { GoogleSpreadsheet } = require('google-spreadsheet')
-const getPresentsFrom = require('../utils/getPresentsFrom')
+const getAttendanceFrom = require('../utils/getAttendanceFrom')
 
 const getSpreadSheet = async () => {
     const doc = new GoogleSpreadsheet('1rtHUbEfEs6np-57ONBQ7gdsjjR3HoGCjYJgOrezUsK4'); // Spreadsheet link ID
@@ -28,7 +28,7 @@ const getAttendanceSheetWithNewHeaderDate = async (document, dateHeader) => {
 const takeAttendance = async (msg, allowedRoles) => {
     executeCheckingRoles(msg, allowedRoles, async () => {
         try {
-            const presentPeople = await getPresentsFrom(msg.channel);
+            const presentPeople = await getAttendanceFrom(msg.channel);
             const doc = await getSpreadSheet();
     
             const day = new Date();
