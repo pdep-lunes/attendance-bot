@@ -11,6 +11,6 @@ bot.on('ready', () => {
 });
 
 bot.on('message', async msg => {
-  const commandToExec = commands.find(command => command.name == msg.content)
+  const commandToExec = commands.find(command => msg.content.startsWith(command.name))
   if(commandToExec) await commandToExec.execute(msg, commandToExec.allowedRoles)
 });
