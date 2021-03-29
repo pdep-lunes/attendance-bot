@@ -1,3 +1,4 @@
+-- Special thanks to @julian-berbel c:
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
 

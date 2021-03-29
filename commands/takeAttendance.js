@@ -3,7 +3,7 @@ const { GoogleSpreadsheet } = require('google-spreadsheet')
 const getAttendanceFrom = require('../utils/getAttendanceFrom')
 
 const getSpreadSheet = async () => {
-    const doc = new GoogleSpreadsheet('1rtHUbEfEs6np-57ONBQ7gdsjjR3HoGCjYJgOrezUsK4'); // Spreadsheet link ID
+    const doc = new GoogleSpreadsheet(process.env.GOOGLE_SPREADSHEET_LINK_ID);
     await doc.useServiceAccountAuth({
         client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
         private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n')
