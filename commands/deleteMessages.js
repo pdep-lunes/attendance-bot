@@ -1,4 +1,4 @@
-const executeCheckingRoles = require('../utils/executeCheckingRoles')
+const executeCheckingRoles = require('../utils/roles')
 
 const deleteMessages = async (msg, allowedRoles) => {
     let channel = msg.channel;
