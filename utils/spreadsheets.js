@@ -26,9 +26,8 @@ const getAttendanceSheetWithNewHeaderDate = async (document, dateHeader) => {
 const updateRows = (dataOnSheet, presentPeople, dateHeader) => presentPeople.forEach(async presentPerson => {
   const rowToUpdate = dataOnSheet.find(row => row.username === presentPerson);
   if(rowToUpdate) {
-      /* rowToUpdate[dateHeader] = "P";
+      rowToUpdate[dateHeader] = "P";
       await rowToUpdate.save()
-      */
   } else {
     console.log(`${presentPerson} no fue encontrado.`)
   }
