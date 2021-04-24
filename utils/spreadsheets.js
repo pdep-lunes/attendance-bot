@@ -1,3 +1,5 @@
+const { GoogleSpreadsheet } = require('google-spreadsheet')
+
 const getSpreadSheet = async () => {
   const doc = new GoogleSpreadsheet(process.env.GOOGLE_SPREADSHEET_LINK_ID);
   await doc.useServiceAccountAuth({
@@ -21,11 +23,14 @@ const getAttendanceSheetWithNewHeaderDate = async (document, dateHeader) => {
   return sheet;
 }
 
-const updateRows = (sheet, presentPeople) => presentPeople.forEach(async presentPerson => {
-  const rowToUpdate = dataOnSheet.find(row => row.username == presentPerson);
+const updateRows = (dataOnSheet, presentPeople, dateHeader) => presentPeople.forEach(async presentPerson => {
+  const rowToUpdate = dataOnSheet.find(row => row.username === presentPerson);
   if(rowToUpdate) {
-      rowToUpdate[dateHeader] = "P";
+      /* rowToUpdate[dateHeader] = "P";
       await rowToUpdate.save()
+      */
+  } else {
+    console.log(`${presentPerson} no fue encontrado.`)
   }
 })
 
