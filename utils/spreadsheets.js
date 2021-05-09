@@ -12,29 +12,38 @@ const getSpreadSheet = async () => {
 
 const getAttendanceSheetWithNewHeaderDate = async (document, dateHeader) => {
   const sheet = Object.values(document.sheetsById).find(sheet => sheet.title === "Asistencia");
-  await sheet.loadHeaderRow();
-  
-  try {
-      await sheet.setHeaderRow([...sheet.headerValues, dateHeader]);
-  } catch(error) {
-      console.log("header date is already defined");
-  }
 
+  await sheet.loadHeaderRow();
+  await sheet.loadCells();
+  try {
+    await sheet.setHeaderRow([...sheet.headerValues, dateHeader]);
+  } catch(error) {
+    console.log("header date is already defined");
+  }
+  
   return sheet;
 }
 
-const updateRows = (dataOnSheet, presentPeople, dateHeader) => presentPeople.forEach(async presentPerson => {
+const getColumnIndex = (sheet, dateHeader) => sheet.headerValues.findIndex(header => header === dateHeader);
+
+const updateRows = (dataOnSheet, presentPeople, sheet, columnDayIndex) => {
+  presentPeople.forEach(presentPerson => {
   const rowToUpdate = dataOnSheet.find(row => row.username === presentPerson);
+
   if(rowToUpdate) {
-      rowToUpdate[dateHeader] = "P";
-      await rowToUpdate.save()
+    const cellToUpdate = sheet.getCell(rowToUpdate.rowNumber - 1, columnDayIndex);
+    cellToUpdate.value = 'P';
   } else {
     console.log(`${presentPerson} no fue encontrado.`)
   }
-})
+  })
+
+  return sheet.saveUpdatedCells();
+}
 
 module.exports = {
   getSpreadSheet,
   getAttendanceSheetWithNewHeaderDate,
-  updateRows
+  updateRows,
+  getColumnIndex
 }

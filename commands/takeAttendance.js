@@ -1,6 +1,6 @@
 const executeCheckingRoles = require('../utils/roles')
 const { getAttendanceFrom, sendErrorToAuthor } = require('../utils/discord');
-const { updateRows, getSpreadSheet, getAttendanceSheetWithNewHeaderDate } = require('../utils/spreadsheets');
+const { updateRows, getSpreadSheet, getAttendanceSheetWithNewHeaderDate, getColumnIndex } = require('../utils/spreadsheets');
 const { getDateHeader, getDateToFilter } = require('../utils/dates');
 
 const takeAttendance = (msg, allowedRoles) => executeCheckingRoles(msg, allowedRoles, async () => {
@@ -20,9 +20,11 @@ const takeAttendance = (msg, allowedRoles) => executeCheckingRoles(msg, allowedR
             const dateHeader = getDateHeader(dateToFilter);
             const sheet = await getAttendanceSheetWithNewHeaderDate(doc, dateHeader);
             
+            const columnIndex = getColumnIndex(sheet, dateHeader);
+
             const dataOnSheet = await sheet.getRows();
 
-            await updateRows(dataOnSheet, presentPeople, dateHeader)
+            await updateRows(dataOnSheet, presentPeople, sheet, columnIndex)
         } catch (error) {
             console.log(error)
         }
