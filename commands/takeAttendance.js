@@ -1,53 +1,31 @@
-const executeCheckingRoles = require('../utils/executeCheckingRoles')
-const { GoogleSpreadsheet } = require('google-spreadsheet')
-const getAttendanceFrom = require('../utils/getAttendanceFrom')
+const executeCheckingRoles = require('../utils/roles')
+const { getAttendanceFrom, sendErrorToAuthor } = require('../utils/discord');
+const { updateRows, getSpreadSheet, getAttendanceSheetWithNewHeaderDate } = require('../utils/spreadsheets');
+const { getDateHeader, getDateToFilter } = require('../utils/dates');
 
-const getSpreadSheet = async () => {
-    const doc = new GoogleSpreadsheet(process.env.GOOGLE_SPREADSHEET_LINK_ID);
-    await doc.useServiceAccountAuth({
-        client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n')
-    });
-    await doc.loadInfo();
-    return doc;
-}
-
-const getAttendanceSheetWithNewHeaderDate = async (document, dateHeader) => {
-    const sheet = Object.values(document.sheetsById).find(sheet => sheet.title == "Asistencia");
-    await sheet.loadHeaderRow();
-    
-    try {
-        await sheet.setHeaderRow([...sheet.headerValues, dateHeader]);
-    } catch(error) {
-        console.log("header date is already defined");
-    }
-
-    return sheet;
-}
-
-const takeAttendance = async (msg, allowedRoles) => {
-    await executeCheckingRoles(msg, allowedRoles, async () => {
+const takeAttendance = (msg, allowedRoles) => executeCheckingRoles(msg, allowedRoles, async () => {
         try {
-            const presentPeople = await getAttendanceFrom(msg.channel);
+            const dateToFilter = getDateToFilter(msg.content);
+            
+            if(!dateToFilter.getTime()) return sendErrorToAuthor(
+                msg.author, 
+                msg.content, 
+                'La fecha no es válida. Intentá definirla mediante notación "DD/MM" (El año ya está predefinido)'
+                );
+
+            const presentPeople = await getAttendanceFrom(msg.channel, dateToFilter);
+
             const doc = await getSpreadSheet();
     
-            const day = new Date();
-            const dateHeader =  `${day.getDate().toString()}/${(day.getMonth() + 1).toString()}`;
+            const dateHeader = getDateHeader(dateToFilter);
             const sheet = await getAttendanceSheetWithNewHeaderDate(doc, dateHeader);
-    
+            
             const dataOnSheet = await sheet.getRows();
-    
-            presentPeople.forEach(async presentPerson => {
-                const rowToUpdate = dataOnSheet.find(row => row.username == presentPerson);
-                if(rowToUpdate) {
-                    rowToUpdate[dateHeader] = "P";
-                    await rowToUpdate.save()
-                }
-            })
+
+            await updateRows(dataOnSheet, presentPeople, dateHeader)
         } catch (error) {
             console.log(error)
         }
     })
-}
 
 module.exports = takeAttendance
